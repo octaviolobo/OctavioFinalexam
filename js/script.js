@@ -21,7 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
     setInterval(changeBackgroundColor, 2000);
 });
 
-let enterButton = document.getElementById("enter");
+let addButton = document.getElementById("addTask");
+let askUserButton = document.getElementById("askUser");
 let input = document.getElementById("userInput");
 let ul = document.querySelector("ul");
 let item = document.getElementsByTagName("li");
@@ -35,11 +36,18 @@ function listLength() {
 }
 
 function createListElement() {
-    let li = document.createElement("li"); // creates an element "li"
+    let li = document.createElement("li")
+    const existingItems = Array.from(document.getElementsByTagName("li"));
+    const taskExists = existingItems.some(item => item.textContent.replace("X", "").trim() === input.value.trim());
+    
+    if (taskExists) {
+        alert("Task already exists!");
+        return; 
+    } 
     li.appendChild(document.createTextNode(input.value)); //makes text from input field the li text
     ul.appendChild(li); //adds li to ul
     input.value = ""; //Reset text input field
-
+    
 
     //START STRIKETHROUGH
     // because it's in the function, it only adds it for new items
@@ -55,7 +63,19 @@ function createListElement() {
     let dBtn = document.createElement("button");
     dBtn.appendChild(document.createTextNode("X"));
     li.appendChild(dBtn);
-
+    dBtn.addEventListener("click", function () {
+        ul.removeChild(li); 
+    })
+}
+function askUser() {
+    let userInput;
+    do {
+        userInput = prompt("Enter a new task (or type 'exit' to stop):");
+        if (userInput && userInput.toLowerCase() !== 'exit' && userInput.trim().length > 0) {
+            input.value = userInput.trim(); // Set prompt input as value in the input field
+            createListElement();
+        }
+    } while (userInput && userInput.toLowerCase() !== 'exit');
 }
 
 
@@ -73,7 +93,6 @@ function addListAfterKeypress(event) {
 }
 
 
-enterButton.addEventListener("click", addListAfterClick);
-
+addButton.addEventListener("click", addListAfterClick);
+askUserButton.addEventListener("click", askUser);
 input.addEventListener("keypress", addListAfterKeypress);
-
